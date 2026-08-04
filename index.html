@@ -6,6 +6,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1c1b1a">
+<script src="https://sdk.scdn.co/spotify-player.js"></script>
 <style>
   :root{
     --bg: #1c1b1a;
@@ -447,6 +450,56 @@
 
   ::-webkit-scrollbar{ width:6px; }
   ::-webkit-scrollbar-thumb{ background:var(--line); border-radius:10px; }
+
+  /* ---------- Side panels (Spotify + Alarms) ---------- */
+  .side-panel{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:24px;
+  }
+  .side-heading{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:16px;
+  }
+  .side-heading h2{
+    font-family:'Fraunces', serif;
+    font-size:18px;
+    font-weight:600;
+    margin:0;
+  }
+  .side-heading span{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    color:var(--muted);
+  }
+  .side-copy{
+    font-size:13.5px;
+    color:var(--muted);
+    line-height:1.5;
+    margin:0 0 16px;
+  }
+  .now-playing{
+    background:var(--surface-raised);
+    border:1px dashed var(--line);
+    border-radius:10px;
+    padding:14px;
+    font-size:13px;
+    color:var(--muted);
+    margin-top:14px;
+    word-break:break-word;
+  }
+  input[type="time"]{
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:9px;
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    font-size:13px;
+    padding:0 10px;
+  }
 </style>
 </head>
 <body>
@@ -524,6 +577,52 @@
       <div id="logView" style="display:none;">
         <div class="todo-list" id="logList" style="max-height:480px;"></div>
       </div>
+    </div>
+
+  </div>
+
+  <div class="grid" style="margin-top:20px;">
+
+    <!-- Spotify -->
+    <div class="side-panel">
+      <div class="side-heading">
+        <h2>Soundtrack</h2>
+        <span id="spotifyStatus">Not connected</span>
+      </div>
+
+      <div id="spotifyLoggedOut">
+        <p class="side-copy">Connect Spotify to control playback while you focus. Requires Spotify Premium.</p>
+        <button class="btn primary" id="spotifyLoginBtn" style="width:100%;">Connect Spotify</button>
+      </div>
+
+      <div id="spotifyLoggedIn" style="display:none;">
+        <div class="add-row">
+          <input type="text" id="spotifyUriInput" placeholder="Paste a Spotify track/playlist link…">
+          <button class="add-submit" id="spotifyPlayUriBtn">▶</button>
+        </div>
+        <div class="now-playing" id="nowPlaying">Nothing queued yet</div>
+        <div class="controls" style="margin-top:14px;">
+          <button class="btn ghost" id="spotifyPrevBtn">⏮</button>
+          <button class="btn primary" id="spotifyPlayPauseBtn">Play</button>
+          <button class="btn ghost" id="spotifyNextBtn">⏭</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alarms -->
+    <div class="side-panel">
+      <div class="side-heading">
+        <h2>Task alarms</h2>
+        <span id="alarmCount">0 set</span>
+      </div>
+
+      <div class="add-row">
+        <input type="text" id="alarmLabelInput" placeholder="What's this alarm for?" maxlength="80">
+        <input type="time" id="alarmTimeInput" class="priority-select" style="width:120px;">
+        <button class="add-submit" id="addAlarmBtn">+</button>
+      </div>
+
+      <ul class="todo-list" id="alarmList"></ul>
     </div>
 
   </div>
@@ -824,7 +923,302 @@
   });
 
   renderTodos();
+
+  // ================= Spotify (Full playback control) =================
+  // 1. Create an app at https://developer.spotify.com/dashboard
+  // 2. Add a Redirect URI that EXACTLY matches your live GitHub Pages URL
+  //    (e.g. https://rawwnbuilds.github.io/focus-ticket/) — trailing slash matters.
+  // 3. Paste your Client ID below.
+  // 4. Requires Spotify PREMIUM to actually play audio (free accounts can log
+  //    in, but Spotify's API will block playback).
+  // 5. This will NOT work in a chat preview — Spotify only allows registered
+  //    redirect URIs, so it only works once deployed to your real URL.
+  const SPOTIFY_CLIENT_ID = 'PASTE_YOUR_SPOTIFY_CLIENT_ID_HERE';
+  const SPOTIFY_REDIRECT_URI = window.location.origin + window.location.pathname;
+  const SPOTIFY_SCOPES = 'streaming user-read-email user-read-private user-modify-playback-state user-read-playback-state';
+
+  let spotifyAccessToken = null;
+  let spotifyPlayer = null;
+  let spotifyDeviceId = null;
+  let spotifyIsPlaying = false;
+
+  const spotifyStatus = document.getElementById('spotifyStatus');
+  const spotifyLoggedOut = document.getElementById('spotifyLoggedOut');
+  const spotifyLoggedIn = document.getElementById('spotifyLoggedIn');
+  const spotifyLoginBtn = document.getElementById('spotifyLoginBtn');
+  const spotifyUriInput = document.getElementById('spotifyUriInput');
+  const spotifyPlayUriBtn = document.getElementById('spotifyPlayUriBtn');
+  const nowPlaying = document.getElementById('nowPlaying');
+  const spotifyPlayPauseBtn = document.getElementById('spotifyPlayPauseBtn');
+  const spotifyPrevBtn = document.getElementById('spotifyPrevBtn');
+  const spotifyNextBtn = document.getElementById('spotifyNextBtn');
+
+  function randomString(len){
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let out = '';
+    for(let i=0;i<len;i++) out += chars[Math.floor(Math.random()*chars.length)];
+    return out;
+  }
+
+  async function pkceChallenge(verifier){
+    const data = new TextEncoder().encode(verifier);
+    const digest = await crypto.subtle.digest('SHA-256', data);
+    return btoa(String.fromCharCode(...new Uint8Array(digest)))
+      .replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
+  }
+
+  spotifyLoginBtn && spotifyLoginBtn.addEventListener('click', async () => {
+    if(SPOTIFY_CLIENT_ID === 'PASTE_YOUR_SPOTIFY_CLIENT_ID_HERE'){
+      alert('Add your Spotify Client ID in the code first (see comments near SPOTIFY_CLIENT_ID).');
+      return;
+    }
+    const verifier = randomString(64);
+    sessionStorage.setItem('spotify_verifier', verifier);
+    const challenge = await pkceChallenge(verifier);
+    const params = new URLSearchParams({
+      client_id: SPOTIFY_CLIENT_ID,
+      response_type: 'code',
+      redirect_uri: SPOTIFY_REDIRECT_URI,
+      scope: SPOTIFY_SCOPES,
+      code_challenge_method: 'S256',
+      code_challenge: challenge
+    });
+    window.location.href = `https://accounts.spotify.com/authorize?${params.toString()}`;
+  });
+
+  async function exchangeSpotifyCode(code){
+    const verifier = sessionStorage.getItem('spotify_verifier');
+    const body = new URLSearchParams({
+      client_id: SPOTIFY_CLIENT_ID,
+      grant_type: 'authorization_code',
+      code,
+      redirect_uri: SPOTIFY_REDIRECT_URI,
+      code_verifier: verifier
+    });
+    const res = await fetch('https://accounts.spotify.com/api/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body
+    });
+    const data = await res.json();
+    if(data.access_token){
+      spotifyAccessToken = data.access_token;
+      sessionStorage.setItem('spotify_refresh', data.refresh_token || '');
+      history.replaceState({}, '', SPOTIFY_REDIRECT_URI);
+      showSpotifyLoggedIn();
+    }
+  }
+
+  function showSpotifyLoggedIn(){
+    spotifyStatus.textContent = 'Connected';
+    spotifyLoggedOut.style.display = 'none';
+    spotifyLoggedIn.style.display = 'block';
+    initSpotifyPlayer();
+  }
+
+  window.onSpotifyWebPlaybackSDKReady = () => {
+    if(!spotifyAccessToken) return;
+    initSpotifyPlayer();
+  };
+
+  function initSpotifyPlayer(){
+    if(spotifyPlayer || typeof Spotify === 'undefined' || !spotifyAccessToken) return;
+    spotifyPlayer = new Spotify.Player({
+      name: 'Focus Ticket Player',
+      getOAuthToken: cb => cb(spotifyAccessToken),
+      volume: 0.5
+    });
+    spotifyPlayer.addListener('ready', ({ device_id }) => {
+      spotifyDeviceId = device_id;
+    });
+    spotifyPlayer.addListener('player_state_changed', state => {
+      if(!state) return;
+      spotifyIsPlaying = !state.paused;
+      spotifyPlayPauseBtn.textContent = spotifyIsPlaying ? 'Pause' : 'Play';
+      const track = state.track_window && state.track_window.current_track;
+      if(track) nowPlaying.textContent = `${track.name} — ${track.artists.map(a=>a.name).join(', ')}`;
+    });
+    spotifyPlayer.connect();
+  }
+
+  async function spotifyApi(path, options = {}){
+    return fetch(`https://api.spotify.com/v1${path}`, {
+      ...options,
+      headers: {
+        'Authorization': `Bearer ${spotifyAccessToken}`,
+        'Content-Type': 'application/json',
+        ...(options.headers || {})
+      }
+    });
+  }
+
+  function parseSpotifyLink(input){
+    // Accepts open.spotify.com links or spotify:uri format
+    const match = input.match(/spotify\.com\/(track|playlist|album)\/([a-zA-Z0-9]+)/);
+    if(match) return { type: match[1], uri: `spotify:${match[1]}:${match[2]}` };
+    const uriMatch = input.match(/spotify:(track|playlist|album):([a-zA-Z0-9]+)/);
+    if(uriMatch) return { type: uriMatch[1], uri: input };
+    return null;
+  }
+
+  spotifyPlayUriBtn && spotifyPlayUriBtn.addEventListener('click', async () => {
+    const parsed = parseSpotifyLink(spotifyUriInput.value.trim());
+    if(!parsed || !spotifyDeviceId) return;
+    const body = parsed.type === 'track' ? { uris: [parsed.uri] } : { context_uri: parsed.uri };
+    await spotifyApi(`/me/player/play?device_id=${spotifyDeviceId}`, {
+      method: 'PUT',
+      body: JSON.stringify(body)
+    });
+  });
+
+  spotifyPlayPauseBtn && spotifyPlayPauseBtn.addEventListener('click', async () => {
+    if(!spotifyDeviceId) return;
+    await spotifyApi(`/me/player/${spotifyIsPlaying ? 'pause' : 'play'}?device_id=${spotifyDeviceId}`, { method: 'PUT' });
+  });
+
+  spotifyPrevBtn && spotifyPrevBtn.addEventListener('click', async () => {
+    if(!spotifyDeviceId) return;
+    await spotifyApi(`/me/player/previous?device_id=${spotifyDeviceId}`, { method: 'POST' });
+  });
+
+  spotifyNextBtn && spotifyNextBtn.addEventListener('click', async () => {
+    if(!spotifyDeviceId) return;
+    await spotifyApi(`/me/player/next?device_id=${spotifyDeviceId}`, { method: 'POST' });
+  });
+
+  // Handle redirect back from Spotify login
+  (function checkSpotifyRedirect(){
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    if(code) exchangeSpotifyCode(code);
+  })();
+
+  // ================= Alarm clock (for other tasks) =================
+  const alarmLabelInput = document.getElementById('alarmLabelInput');
+  const alarmTimeInput = document.getElementById('alarmTimeInput');
+  const addAlarmBtn = document.getElementById('addAlarmBtn');
+  const alarmList = document.getElementById('alarmList');
+  const alarmCount = document.getElementById('alarmCount');
+
+  let alarms = []; // {id, label, time: 'HH:MM', lastFiredDate: 'YYYY-MM-DD'|null}
+  let alarmIdCounter = 0;
+
+  if('Notification' in window && Notification.permission === 'default'){
+    // Ask once, quietly, the first time an alarm is added rather than on load.
+  }
+
+  function renderAlarms(){
+    alarmList.innerHTML = '';
+    if(alarms.length === 0){
+      alarmList.innerHTML = `
+        <li class="empty-state">
+          <div class="stub">No alarms set</div>
+          Add a time above for a reminder outside your focus sessions.
+        </li>`;
+    } else {
+      alarms
+        .slice()
+        .sort((a,b) => a.time.localeCompare(b.time))
+        .forEach(alarm => {
+          const li = document.createElement('li');
+          li.className = 'ticket';
+          li.innerHTML = `
+            <span class="tag" style="color:var(--sage); background:rgba(127,165,131,0.14);">${alarm.time}</span>
+            <span class="ticket-text">${alarm.label}</span>
+            <button class="del" data-id="${alarm.id}">✕</button>
+          `;
+          alarmList.appendChild(li);
+        });
+    }
+    alarmCount.textContent = `${alarms.length} set`;
+  }
+
+  addAlarmBtn.addEventListener('click', () => {
+    const label = alarmLabelInput.value.trim();
+    const time = alarmTimeInput.value;
+    if(!label || !time) return;
+    if('Notification' in window && Notification.permission === 'default'){
+      Notification.requestPermission();
+    }
+    alarmIdCounter++;
+    alarms.push({ id: alarmIdCounter, label, time, lastFiredDate: null });
+    alarmLabelInput.value = '';
+    alarmTimeInput.value = '';
+    renderAlarms();
+  });
+
+  alarmList.addEventListener('click', e => {
+    const id = Number(e.target.dataset.id);
+    if(!id) return;
+    if(e.target.classList.contains('del')){
+      alarms = alarms.filter(a => a.id !== id);
+      renderAlarms();
+    }
+  });
+
+  function checkAlarms(){
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2,'0');
+    const mm = String(now.getMinutes()).padStart(2,'0');
+    const currentTime = `${hh}:${mm}`;
+    const today = now.toISOString().slice(0,10);
+
+    alarms.forEach(alarm => {
+      if(alarm.time === currentTime && alarm.lastFiredDate !== today){
+        alarm.lastFiredDate = today;
+        playChime();
+        if('Notification' in window && Notification.permission === 'granted'){
+          new Notification(alarm.label, { body: 'Alarm from Focus Ticket' });
+        }
+      }
+    });
+  }
+
+  setInterval(checkAlarms, 15000);
+  renderAlarms();
+
+  // ================= PWA install support =================
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('service-worker.js').catch(() => {
+        // No service worker file present yet — app still works without it,
+        // it just won't be installable until you add service-worker.js.
+      });
+    });
+  }
 </script>
+
+<a href="https://www.buymeacoffee.com/rawwn" target="_blank" rel="noopener" class="bmc-btn">
+  ☕ Buy me a coffee
+</a>
+
+<style>
+  .bmc-btn{
+    position:fixed;
+    bottom:20px;
+    right:20px;
+    background:var(--accent);
+    color:#1c1b1a;
+    font-family:'Inter', sans-serif;
+    font-weight:600;
+    font-size:13.5px;
+    padding:12px 18px;
+    border-radius:30px;
+    text-decoration:none;
+    box-shadow:0 4px 14px rgba(0,0,0,0.35);
+    z-index:999;
+    transition:transform .15s, background .4s;
+  }
+  .bmc-btn:hover{ transform:translateY(-2px); }
+  @media (max-width: 480px){
+    .bmc-btn{
+      bottom:14px;
+      right:14px;
+      padding:10px 14px;
+      font-size:12.5px;
+    }
+  }
+</style>
 
 </body>
 </html>
