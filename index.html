@@ -1,0 +1,550 @@
+<title>Content Writing Resource Library</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap">
+
+<style>
+:root {
+  --bg: #f7f5f2;
+  --surface: #ffffff;
+  --surface2: #f2ede8;
+  --border: #e4dfd8;
+  --fg: #1c1814;
+  --fg-muted: #6b6157;
+  --fg-faint: #a39890;
+  --accent: #b8722a;
+  --accent-bg: #fef3e2;
+  --tag-video: #1d4ed8;
+  --tag-video-bg: #eff6ff;
+  --tag-article: #15803d;
+  --tag-article-bg: #f0fdf4;
+  --tag-tool: #7c3aed;
+  --tag-tool-bg: #f5f3ff;
+  --shadow: 0 1px 3px rgba(0,0,0,0.05), 0 4px 12px rgba(0,0,0,0.05);
+  --font-display: 'Lora', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #171310;
+    --surface: #211d1a;
+    --surface2: #2a2420;
+    --border: #342e29;
+    --fg: #f0ece6;
+    --fg-muted: #9d9089;
+    --fg-faint: #5c544e;
+    --accent: #d4874f;
+    --accent-bg: #2a1e10;
+    --tag-video: #93c5fd;
+    --tag-video-bg: #1e3a5f;
+    --tag-article: #86efac;
+    --tag-article-bg: #14532d;
+    --tag-tool: #c4b5fd;
+    --tag-tool-bg: #3b0764;
+    --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 4px 12px rgba(0,0,0,0.2);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #171310;
+  --surface: #211d1a;
+  --surface2: #2a2420;
+  --border: #342e29;
+  --fg: #f0ece6;
+  --fg-muted: #9d9089;
+  --fg-faint: #5c544e;
+  --accent: #d4874f;
+  --accent-bg: #2a1e10;
+  --tag-video: #93c5fd;
+  --tag-video-bg: #1e3a5f;
+  --tag-article: #86efac;
+  --tag-article-bg: #14532d;
+  --tag-tool: #c4b5fd;
+  --tag-tool-bg: #3b0764;
+  --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 4px 12px rgba(0,0,0,0.2);
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100%;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 60px;
+}
+
+/* Hero */
+.hero {
+  background: var(--fg);
+  color: var(--bg);
+  padding: 48px max(24px, env(safe-area-inset-left, 0px));
+  margin-left: max(-16px, calc(-1 * env(safe-area-inset-left, 16px)));
+  margin-right: max(-16px, calc(-1 * env(safe-area-inset-right, 16px)));
+  margin-bottom: 36px;
+}
+.hero-inner {
+  max-width: 780px;
+  margin: 0 auto;
+}
+.hero-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.55;
+  margin-bottom: 10px;
+}
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(24px, 4vw, 34px);
+  font-weight: 700;
+  text-wrap: balance;
+  margin-bottom: 10px;
+}
+.hero p {
+  opacity: 0.65;
+  font-size: 14px;
+  max-width: 520px;
+}
+
+/* Controls */
+.controls {
+  max-width: 780px;
+  margin: 0 auto 28px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.search-box {
+  flex: 1;
+  min-width: 220px;
+  position: relative;
+}
+.search-box svg {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--fg-muted);
+  pointer-events: none;
+  flex-shrink: 0;
+}
+.search-input {
+  width: 100%;
+  padding: 10px 12px 10px 38px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.search-input::placeholder { color: var(--fg-faint); }
+.search-input:focus { border-color: var(--accent); }
+
+.filters {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.filter-btn {
+  padding: 7px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  background: transparent;
+  color: var(--fg-muted);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.12s;
+  white-space: nowrap;
+}
+.filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+.filter-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* Grid */
+.main { max-width: 780px; margin: 0 auto; }
+
+.section-heading {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--fg);
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-heading .section-num {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-bg);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.module-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  margin: 20px 0 10px;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: border-color 0.12s;
+}
+.card:hover { border-color: var(--accent); }
+
+.card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.type-tag {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+.type-tag.video { color: var(--tag-video); background: var(--tag-video-bg); }
+.type-tag.article { color: var(--tag-article); background: var(--tag-article-bg); }
+.type-tag.tool { color: var(--tag-tool); background: var(--tag-tool-bg); }
+
+.source-name {
+  font-size: 11px;
+  color: var(--fg-faint);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--fg);
+  line-height: 1.4;
+}
+
+.card-desc {
+  font-size: 13px;
+  color: var(--fg-muted);
+  line-height: 1.5;
+  flex: 1;
+}
+
+.card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+  margin-top: 4px;
+}
+.card-link:hover { text-decoration: underline; }
+.card-link svg { flex-shrink: 0; }
+
+.section-block { margin-bottom: 40px; }
+
+.empty {
+  text-align: center;
+  color: var(--fg-muted);
+  padding: 48px 16px;
+  font-size: 14px;
+}
+
+@media (max-width: 480px) {
+  .cards { grid-template-columns: 1fr; }
+  .hero { padding: 36px 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card, .filter-btn, .search-input { transition: none; }
+}
+</style>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">Magnaitic</div>
+    <h1>Content Writing Resource Library</h1>
+    <p>Curated videos, articles, and tools for every module of the course. Use the search or filters to find what you need.</p>
+  </div>
+</div>
+
+<div class="controls">
+  <div class="search-box">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" stroke-width="1.5"/>
+      <path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+    <input class="search-input" type="search" id="searchInput" placeholder="Search resources..." aria-label="Search resources">
+  </div>
+  <div class="filters" id="filters">
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="s1">Section 1</button>
+    <button class="filter-btn" data-filter="s2">Section 2</button>
+    <button class="filter-btn" data-filter="s3">Section 3</button>
+    <button class="filter-btn" data-filter="video">Videos</button>
+    <button class="filter-btn" data-filter="article">Articles</button>
+    <button class="filter-btn" data-filter="tool">Tools</button>
+  </div>
+</div>
+
+<main class="main" id="main"></main>
+
+<script>
+const DATA = [
+  // SECTION 1
+  {
+    section: "s1",
+    sectionTitle: "Section 1: How Search Works and Why It Matters",
+    module: "Module 1: What Search Is and How Google Actually Works",
+    resources: [
+      { type:"video", title:"How Google Search Works", source:"Google Search Central", desc:"Google's official walkthrough of crawling, indexing, and ranking. The best starting point for understanding what happens after you hit publish.", url:"https://www.youtube.com/@GoogleSearchCentral" },
+      { type:"article", title:"How Search Works", source:"Google", desc:"Google's own visual guide to crawling, indexing, and serving results. Covers the full pipeline in plain language.", url:"https://www.google.com/search/howsearchworks/" },
+      { type:"article", title:"How Google Search Works: A Guide for Beginners", source:"Ahrefs Blog", desc:"Explains PageRank, crawl budget, and what writers can actually control. Practical and accurate.", url:"https://ahrefs.com/blog/how-does-google-search-work/" },
+    ]
+  },
+  {
+    section: "s1",
+    sectionTitle: "Section 1: How Search Works and Why It Matters",
+    module: "Module 2: The History of SEO",
+    resources: [
+      { type:"article", title:"Google Algorithm Updates: A Complete History", source:"Moz", desc:"The authoritative timeline of every major Google update from the beginning. Covers Panda, Penguin, Hummingbird, BERT, and the Helpful Content updates.", url:"https://moz.com/google-algorithm-change" },
+      { type:"article", title:"Google Algorithm Updates History", source:"Ahrefs Blog", desc:"Plain-language breakdown of what each major update penalised and rewarded. Good reference to revisit when a new update drops.", url:"https://ahrefs.com/google-algorithm-updates" },
+      { type:"article", title:"Google Algorithm Updates: A Timeline", source:"Search Engine Journal", desc:"Covers the search engine landscape before Google as well as the major algorithm eras. Good historical context for the SEO evolution module.", url:"https://www.searchenginejournal.com/google-algorithm-updates/" },
+    ]
+  },
+  {
+    section: "s1",
+    sectionTitle: "Section 1: How Search Works and Why It Matters",
+    module: "Module 3: What LLMs Are and Why Writers Need to Understand Them",
+    resources: [
+      { type:"video", title:"Intro to Large Language Models", source:"Andrej Karpathy (YouTube)", desc:"A 1-hour visual explanation of how LLMs work, why they hallucinate, and what they are actually doing when they generate text. No math required.", url:"https://www.youtube.com/@AndrejKarpathy" },
+      { type:"video", title:"But what is a GPT? Visual intro to transformers", source:"3Blue1Brown (YouTube)", desc:"Animated, intuitive explanation of the transformer architecture behind every major LLM. Start here if you want to understand the mechanics.", url:"https://www.youtube.com/@3blue1brown" },
+      { type:"article", title:"What Is a Large Language Model?", source:"Google Cloud", desc:"Clear, jargon-free introduction to LLMs from Google. Covers training data, parameters, and practical applications.", url:"https://cloud.google.com/discover/what-are-large-language-models" },
+    ]
+  },
+  {
+    section: "s1",
+    sectionTitle: "Section 1: How Search Works and Why It Matters",
+    module: "Module 4: E-E-A-T, AI Overviews, and What Google Values",
+    resources: [
+      { type:"article", title:"What Is E-E-A-T and Why Does It Matter?", source:"Google Search Central", desc:"Google's own documentation on Experience, Expertise, Authoritativeness, and Trustworthiness. This is the primary source.", url:"https://developers.google.com/search/docs/fundamentals/creating-helpful-content" },
+      { type:"article", title:"E-E-A-T: What It Is and How to Demonstrate It", source:"Moz Blog", desc:"Practical breakdown of each E-E-A-T signal with examples of what good and weak content looks like against each criterion.", url:"https://moz.com/blog/eeat" },
+      { type:"article", title:"Google AI Overviews: Everything You Need to Know", source:"Search Engine Journal", desc:"What AI Overviews are, how Google selects content to cite, and what writers can do to appear in them.", url:"https://www.searchenginejournal.com/google-ai-overviews/" },
+    ]
+  },
+  {
+    section: "s1",
+    sectionTitle: "Section 1: How Search Works and Why It Matters",
+    module: "Module 5: Keyword Research Basics",
+    resources: [
+      { type:"article", title:"Keyword Research: The Beginner's Guide", source:"Moz", desc:"The foundational guide to keyword research. Covers search volume, difficulty, intent, and how to choose keywords that your site can actually rank for.", url:"https://moz.com/learn/seo/keyword-research" },
+      { type:"article", title:"Keyword Research for SEO: The Definitive Guide", source:"Ahrefs Blog", desc:"Step-by-step keyword research process using real tools and real examples. One of the most thorough free guides available.", url:"https://ahrefs.com/blog/keyword-research/" },
+      { type:"tool", title:"Google Keyword Planner", source:"Google Ads", desc:"The tool shown in the course. Free with a Google Ads account. Use it to find search volume estimates and related keyword ideas.", url:"https://ads.google.com/home/tools/keyword-planner/" },
+    ]
+  },
+  // SECTION 2
+  {
+    section: "s2",
+    sectionTitle: "Section 2: From Brief to Published",
+    module: "Module 6: Keyword Research Live and Brief Walkthrough",
+    resources: [
+      { type:"article", title:"How to Write a Content Brief (With Template)", source:"Ahrefs Blog", desc:"What a brief should contain, why each element matters, and how to build one that a writer can actually use.", url:"https://ahrefs.com/blog/content-brief/" },
+      { type:"article", title:"What Is Search Intent? A Complete Guide", source:"Semrush Blog", desc:"Deep dive into the four intent types with real SERP examples. Good reference when reading a brief and identifying what type of article you need to write.", url:"https://www.semrush.com/blog/search-intent/" },
+      { type:"tool", title:"Google Keyword Planner", source:"Google Ads", desc:"Used in the live keyword research walkthrough. Find monthly search volume and related keyword suggestions.", url:"https://ads.google.com/home/tools/keyword-planner/" },
+    ]
+  },
+  {
+    section: "s2",
+    sectionTitle: "Section 2: From Brief to Published",
+    module: "Module 7: Writing the Article from a Brief",
+    resources: [
+      { type:"article", title:"How to Write a Blog Post: A Step-by-Step Guide", source:"Ahrefs Blog", desc:"Practical walkthrough of taking a keyword and turning it into a structured article. Covers intros, H2s, and conclusions.", url:"https://ahrefs.com/blog/how-to-write-a-blog-post/" },
+      { type:"article", title:"The Anatomy of a Perfect Blog Post", source:"Backlinko", desc:"Brian Dean's guide to structuring a high-performing article. Covers intro hooks, subheadings, and formatting for readability.", url:"https://backlinko.com/hub/content/blog-posts" },
+    ]
+  },
+  {
+    section: "s2",
+    sectionTitle: "Section 2: From Brief to Published",
+    module: "Module 8: How to Write FAQs and Optimize for AEO",
+    resources: [
+      { type:"article", title:"Answer Engine Optimization: The Complete Guide", source:"Semrush Blog", desc:"What AEO is, how it differs from SEO, and the specific writing changes that help your content get cited by AI tools.", url:"https://www.semrush.com/blog/answer-engine-optimization/" },
+      { type:"article", title:"How to Optimize for Google AI Overviews", source:"Search Engine Journal", desc:"Practical steps for formatting content so it appears in Google's AI-generated answer panels. Covers FAQ structure and direct answers.", url:"https://www.searchenginejournal.com/how-to-optimize-for-google-ai-overviews/" },
+      { type:"article", title:"FAQ Schema: What It Is and How to Use It", source:"Moz Blog", desc:"How to mark up FAQs so search engines and AI tools can parse them correctly. Includes schema markup examples.", url:"https://moz.com/blog/faq-schema" },
+    ]
+  },
+  {
+    section: "s2",
+    sectionTitle: "Section 2: From Brief to Published",
+    module: "Module 9: How to Find and Verify a Source",
+    resources: [
+      { type:"article", title:"How to Evaluate the Credibility of a Source", source:"Purdue OWL", desc:"The CRAAP test and other frameworks for assessing whether a source is reliable. Useful reference for writers who are new to sourcing.", url:"https://owl.purdue.edu/owl/research_and_citation/conducting_research/evaluating_sources_of_information/index.html" },
+      { type:"article", title:"How to Fact-Check Like a Journalist", source:"Poynter", desc:"Practical fact-checking techniques from a journalism training organisation. Covers how to trace a statistic to its original source.", url:"https://www.poynter.org/fact-checking/" },
+    ]
+  },
+  {
+    section: "s2",
+    sectionTitle: "Section 2: From Brief to Published",
+    module: "Module 10: How to Polish Your Draft Using Extensions and AI",
+    resources: [
+      { type:"tool", title:"Grammarly", source:"Grammarly", desc:"The grammar and style checker used in the course. Always set to US English before running it on a draft.", url:"https://www.grammarly.com" },
+      { type:"tool", title:"Webyurt Meta Title Counter", source:"Webyurt", desc:"Free tool to check meta title and description character counts against Google's recommended limits.", url:"https://www.webyurt.com/tools/meta-title-counter" },
+      { type:"article", title:"On-Page SEO: The Complete Guide", source:"Backlinko", desc:"Covers meta titles, descriptions, H1s, internal links, and image optimisation. A good checklist to run through before submitting any article.", url:"https://backlinko.com/on-page-seo" },
+    ]
+  },
+  // SECTION 3
+  {
+    section: "s3",
+    sectionTitle: "Section 3: Publishing and Going Live",
+    module: "Module 11: Meta Titles, Descriptions, and Publishing Your First Blog Post",
+    resources: [
+      { type:"article", title:"How to Write the Perfect Meta Description", source:"Moz", desc:"What makes a meta description earn the click. Covers character limits, keyword placement, and tone.", url:"https://moz.com/learn/seo/meta-description" },
+      { type:"article", title:"How to Write a Meta Title That Ranks and Gets Clicked", source:"Ahrefs Blog", desc:"The rules for meta titles, with real before-and-after examples. Covers the PKW placement rule and click-through optimisation.", url:"https://ahrefs.com/blog/title-tag/" },
+      { type:"tool", title:"Medium", source:"Medium", desc:"Free publishing platform used in the course. Supports meta titles, descriptions, and image insertion. Good for a first published article.", url:"https://medium.com" },
+      { type:"tool", title:"Substack", source:"Substack", desc:"Newsletter and blog platform. Clean editor, built-in audience discovery, and SEO-friendly post structure.", url:"https://substack.com" },
+      { type:"tool", title:"LinkedIn Pulse", source:"LinkedIn", desc:"Publish directly on LinkedIn for immediate professional audience reach. Supports full article formatting and meta information.", url:"https://www.linkedin.com/pulse" },
+    ]
+  },
+];
+
+// Build and render
+const mainEl = document.getElementById('main');
+const searchInput = document.getElementById('searchInput');
+const filterBtns = document.querySelectorAll('.filter-btn');
+
+let activeFilter = 'all';
+let searchTerm = '';
+
+function render() {
+  let filtered = DATA.flatMap(sec => sec.resources.map(r => ({ ...r, section: sec.section, sectionTitle: sec.sectionTitle, module: sec.module })));
+
+  if (searchTerm) {
+    const t = searchTerm.toLowerCase();
+    filtered = filtered.filter(r =>
+      r.title.toLowerCase().includes(t) ||
+      r.desc.toLowerCase().includes(t) ||
+      r.source.toLowerCase().includes(t) ||
+      r.module.toLowerCase().includes(t)
+    );
+  }
+
+  if (['s1','s2','s3'].includes(activeFilter)) {
+    filtered = filtered.filter(r => r.section === activeFilter);
+  } else if (['video','article','tool'].includes(activeFilter)) {
+    filtered = filtered.filter(r => r.type === activeFilter);
+  }
+
+  if (filtered.length === 0) {
+    mainEl.innerHTML = '<div class="empty">No resources match your search. Try different keywords.</div>';
+    return;
+  }
+
+  // Group by section then module
+  const grouped = {};
+  filtered.forEach(r => {
+    const sk = r.sectionTitle;
+    if (!grouped[sk]) grouped[sk] = {};
+    if (!grouped[sk][r.module]) grouped[sk][r.module] = [];
+    grouped[sk][r.module].push(r);
+  });
+
+  let html = '';
+  const sNums = { 'Section 1': 'Section 1', 'Section 2': 'Section 2', 'Section 3': 'Section 3' };
+
+  Object.entries(grouped).forEach(([sec, modules]) => {
+    const numKey = Object.keys(sNums).find(k => sec.startsWith(k));
+    const num = numKey || '';
+    html += `<div class="section-block">
+      <div class="section-heading">
+        <span class="section-num">${num}</span>
+        ${sec.replace(/^Section \d+:\s*/, '')}
+      </div>`;
+
+    Object.entries(modules).forEach(([mod, resources]) => {
+      html += `<div class="module-label">${mod}</div>
+        <div class="cards">`;
+      resources.forEach(r => {
+        html += `<div class="card">
+          <div class="card-top">
+            <span class="type-tag ${r.type}">${r.type}</span>
+            <span class="source-name">${r.source}</span>
+          </div>
+          <div class="card-title">${r.title}</div>
+          <div class="card-desc">${r.desc}</div>
+          <a class="card-link" href="${r.url}" target="_blank" rel="noopener noreferrer">
+            Visit resource
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+              <path d="M2 10L10 2M10 2H5M10 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        </div>`;
+      });
+      html += `</div>`;
+    });
+    html += `</div>`;
+  });
+
+  mainEl.innerHTML = html;
+}
+
+searchInput.addEventListener('input', e => {
+  searchTerm = e.target.value.trim();
+  render();
+});
+
+filterBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    filterBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeFilter = btn.dataset.filter;
+    render();
+  });
+});
+
+render();
+</script>
