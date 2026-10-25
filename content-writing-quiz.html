@@ -564,4 +564,40 @@ document.getElementById('btnRestart').addEventListener('click', () => {
 });
 
 load();
+
+// Tab-switch lock: reset quiz if user leaves the page mid-attempt
+const lockOverlay = document.createElement('div');
+lockOverlay.style.cssText = 'position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:999;padding:32px;text-align:center';
+lockOverlay.innerHTML = `
+  <svg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+    <rect x="10" y="22" width="28" height="20" rx="4" fill="var(--accent)" opacity="0.15"/>
+    <rect x="10" y="22" width="28" height="20" rx="4" stroke="var(--accent)" stroke-width="2"/>
+    <path d="M16 22v-6a8 8 0 0 1 16 0v6" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="24" cy="32" r="2.5" fill="var(--accent)"/>
+  </svg>
+  <div style="font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--fg)">Quiz reset</div>
+  <div style="font-size:14px;color:var(--fg-muted);max-width:340px;line-height:1.6">You left the page during the quiz. Please complete all questions without switching tabs or windows.</div>
+  <button id="lockRestart" style="margin-top:8px;padding:12px 28px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-family:var(--font-body);font-size:15px;font-weight:600;cursor:pointer;">Start over</button>
+`;
+document.body.appendChild(lockOverlay);
+
+document.getElementById('lockRestart').addEventListener('click', () => {
+  lockOverlay.style.display = 'none';
+  cur = 0; score = 0; answered = false;
+  scoreScreen.hidden = true;
+  quizArea.hidden = false;
+  const arc = document.getElementById('scoreArc');
+  arc.style.transition = 'none';
+  arc.style.strokeDashoffset = 2 * Math.PI * 54;
+  load();
+});
+
+document.addEventListener('visibilitychange', () => {
+  const inProgress = (cur > 0) || (cur === 0 && answered);
+  const notFinished = scoreScreen.hidden;
+  if (document.hidden && inProgress && notFinished) {
+    cur = 0; score = 0; answered = false;
+    lockOverlay.style.display = 'flex';
+  }
+});
 </script>
