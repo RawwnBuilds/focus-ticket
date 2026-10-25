@@ -1,0 +1,567 @@
+<title>Content Writing Quiz</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@600;700&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+
+<style>
+/* Layout: single centered card, one question at a time */
+:root {
+  --bg: #f7f5f2;
+  --surface: #ffffff;
+  --border: #e4dfd8;
+  --fg: #1c1814;
+  --fg-muted: #6b6157;
+  --accent: #b8722a;
+  --accent-light: #fef3e2;
+  --correct: #15803d;
+  --correct-bg: #f0fdf4;
+  --wrong: #b91c1c;
+  --wrong-bg: #fef2f2;
+  --progress-track: #ddd8d1;
+  --option-hover: #f2ede8;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.05);
+  --radius: 10px;
+
+  --font-display: 'Lora', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #171310;
+    --surface: #211d1a;
+    --border: #342e29;
+    --fg: #f0ece6;
+    --fg-muted: #9d9089;
+    --accent: #d4874f;
+    --accent-light: #2a1e10;
+    --correct: #22c55e;
+    --correct-bg: #0d2318;
+    --wrong: #ef4444;
+    --wrong-bg: #250d0d;
+    --progress-track: #342e29;
+    --option-hover: #2a2420;
+    --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.25);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #171310;
+  --surface: #211d1a;
+  --border: #342e29;
+  --fg: #f0ece6;
+  --fg-muted: #9d9089;
+  --accent: #d4874f;
+  --accent-light: #2a1e10;
+  --correct: #22c55e;
+  --correct-bg: #0d2318;
+  --wrong: #ef4444;
+  --wrong-bg: #250d0d;
+  --progress-track: #342e29;
+  --option-hover: #2a2420;
+  --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.25);
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 48px 64px;
+}
+
+.wrap {
+  width: 100%;
+  max-width: 660px;
+}
+
+/* Header */
+.quiz-header {
+  text-align: center;
+  margin-bottom: 36px;
+}
+.eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+.quiz-header h1 {
+  font-family: var(--font-display);
+  font-size: clamp(22px, 4.5vw, 30px);
+  font-weight: 700;
+  color: var(--fg);
+  text-wrap: balance;
+  margin-bottom: 8px;
+}
+.quiz-header p {
+  color: var(--fg-muted);
+  font-size: 14px;
+}
+
+/* Progress */
+.progress-area {
+  margin-bottom: 20px;
+}
+.progress-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--fg-muted);
+  margin-bottom: 8px;
+  font-variant-numeric: tabular-nums;
+}
+.progress-bar {
+  height: 3px;
+  background: var(--progress-track);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.35s ease;
+}
+
+/* Section chip */
+.section-chip {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-light);
+  border-radius: 4px;
+  padding: 3px 8px;
+  margin-bottom: 14px;
+}
+
+/* Card */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px 28px 24px;
+  box-shadow: var(--shadow);
+  margin-bottom: 14px;
+}
+
+.q-text {
+  font-size: clamp(15px, 2.5vw, 17px);
+  font-weight: 500;
+  line-height: 1.55;
+  margin-bottom: 22px;
+  color: var(--fg);
+}
+
+/* Options */
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.opt {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 12px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 14.5px;
+  line-height: 1.5;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s, border-color 0.12s;
+  width: 100%;
+}
+.opt:hover:not(:disabled) {
+  background: var(--option-hover);
+  border-color: var(--accent);
+}
+.opt:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.opt:disabled { cursor: default; }
+
+.opt-letter {
+  min-width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--progress-track);
+  color: var(--fg-muted);
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+  transition: background 0.12s, color 0.12s;
+}
+
+.opt.is-correct {
+  background: var(--correct-bg);
+  border-color: var(--correct);
+}
+.opt.is-correct .opt-letter {
+  background: var(--correct);
+  color: #fff;
+}
+.opt.is-wrong {
+  background: var(--wrong-bg);
+  border-color: var(--wrong);
+}
+.opt.is-wrong .opt-letter {
+  background: var(--wrong);
+  color: #fff;
+}
+
+/* Feedback */
+.feedback {
+  margin-top: 14px;
+  padding: 10px 14px;
+  border-radius: 7px;
+  font-size: 13.5px;
+  font-weight: 500;
+}
+.feedback[hidden] { display: none; }
+.feedback.ok { background: var(--correct-bg); color: var(--correct); }
+.feedback.err { background: var(--wrong-bg); color: var(--wrong); }
+
+/* Next btn */
+.btn-next {
+  width: 100%;
+  padding: 13px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btn-next:hover { opacity: 0.88; }
+.btn-next:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.btn-next[hidden] { display: none; }
+
+/* Score screen */
+.score-screen[hidden] { display: none; }
+
+.score-top {
+  text-align: center;
+  margin-bottom: 28px;
+}
+.score-ring {
+  width: 130px;
+  height: 130px;
+  margin: 0 auto 18px;
+}
+.score-num {
+  font-family: var(--font-display);
+  font-size: 38px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.score-sub { font-size: 13px; color: var(--fg-muted); margin-bottom: 10px; }
+.score-grade {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.score-msg {
+  font-size: 14px;
+  color: var(--fg-muted);
+  text-wrap: balance;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.breakdown {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 24px 0;
+}
+.bd-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px 10px;
+  text-align: center;
+}
+.bd-num {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.bd-lbl { font-size: 11px; color: var(--fg-muted); margin-top: 2px; }
+
+.btn-restart {
+  width: 100%;
+  padding: 13px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btn-restart:hover { opacity: 0.88; }
+
+@media (max-width: 440px) {
+  .card { padding: 20px 18px; }
+  .breakdown { grid-template-columns: 1fr 1fr; }
+  .bd-item:last-child { grid-column: span 2; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress-fill, .opt, .btn-next, .btn-restart { transition: none; }
+}
+</style>
+
+<div class="wrap">
+  <header class="quiz-header">
+    <div class="eyebrow">Magnaitic</div>
+    <h1>Content Writing Course</h1>
+    <p>35 questions across 6 sections. Select the best answer for each.</p>
+  </header>
+
+  <div id="quizArea">
+    <div class="progress-area">
+      <div class="progress-meta">
+        <span id="qCount">Question 1 of 35</span>
+        <span id="sectionMeta"></span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="section-chip" id="sectionChip"></div>
+
+    <div class="card">
+      <div class="q-text" id="qText"></div>
+      <div class="options" id="opts"></div>
+      <div class="feedback" id="feedback" hidden></div>
+    </div>
+
+    <button class="btn-next" id="btnNext" hidden>Next question</button>
+  </div>
+
+  <div class="score-screen" id="scoreScreen" hidden>
+    <div class="card score-top">
+      <svg class="score-ring" viewBox="0 0 130 130" aria-hidden="true">
+        <circle cx="65" cy="65" r="54" fill="none" stroke="var(--progress-track)" stroke-width="9"/>
+        <circle cx="65" cy="65" r="54" fill="none" stroke="var(--accent)" stroke-width="9"
+          stroke-linecap="round"
+          stroke-dasharray="339.3" stroke-dashoffset="339.3"
+          transform="rotate(-90 65 65)" id="scoreArc"/>
+      </svg>
+      <div class="score-num" id="scoreNum"></div>
+      <div class="score-sub">Your score</div>
+      <div class="score-grade" id="scoreGrade"></div>
+      <div class="score-msg" id="scoreMsg"></div>
+    </div>
+
+    <div class="breakdown">
+      <div class="bd-item">
+        <div class="bd-num" id="bdOk"></div>
+        <div class="bd-lbl">Correct</div>
+      </div>
+      <div class="bd-item">
+        <div class="bd-num" id="bdErr"></div>
+        <div class="bd-lbl">Incorrect</div>
+      </div>
+      <div class="bd-item">
+        <div class="bd-num" id="bdPct"></div>
+        <div class="bd-lbl">Score</div>
+      </div>
+    </div>
+
+    <button class="btn-restart" id="btnRestart">Take it again</button>
+  </div>
+</div>
+
+<script>
+const QS = [
+  { s:"Section 1: How Search Works", q:"What are the three stages Google uses to process web content?", o:["Write, edit, publish","Crawl, index, rank","Search, click, convert","Keyword, content, backlink"], c:1 },
+  { s:"Section 1: How Search Works", q:"Which of the following does Google's crawler follow to discover new pages?", o:["Meta descriptions","Image alt text","Hyperlinks","Page titles"], c:2 },
+  { s:"Section 1: How Search Works", q:"What does Google's index function like?", o:["A social media feed","A library catalogue of pages it has processed","A list of paid advertisements","A record of every website ever created"], c:1 },
+  { s:"Section 1: How Search Works", q:"Which Google algorithm update specifically targeted low-quality and thin content?", o:["Penguin","Hummingbird","Panda","BERT"], c:2 },
+  { s:"Section 1: How Search Works", q:"What did the Penguin update penalise?", o:["Duplicate content","Slow page load times","Unnatural and spammy link profiles","Pages with no images"], c:2 },
+  { s:"Section 1: How Search Works", q:"Which update helped Google understand natural language and conversational queries?", o:["Panda","Penguin","Hummingbird","PageRank"], c:2 },
+  { s:"Section 1: How Search Works", q:"What does E-E-A-T stand for?", o:["Engagement, Expertise, Authority, Trust","Experience, Expertise, Authoritativeness, Trustworthiness","Editing, Excellence, Accuracy, Transparency","Experience, Editing, Authenticity, Trust"], c:1 },
+  { s:"Section 1: How Search Works", q:"What are YMYL pages?", o:["Pages with high word counts","Pages targeting young audiences","Pages covering topics that could affect a person's health, finances, or safety","Pages with multiple authors"], c:2 },
+  { s:"Section 1: How Search Works", q:"How do large language models generate text?", o:["They search the internet in real time","They retrieve stored facts from a database","They predict the next most likely word based on patterns in training data","They copy sentences from existing articles"], c:2 },
+  { s:"Section 1: How Search Works", q:"What is AI hallucination?", o:["AI generating text that is too short","AI producing confident but factually incorrect information","AI refusing to answer a question","AI repeating the same sentence multiple times"], c:1 },
+  { s:"Section 2: Keywords and Briefs", q:"What is a primary keyword (PKW)?", o:["The keyword with the highest search volume in any category","The main keyword the article is built around, required in the meta title, meta description, and first 100 words","Any keyword mentioned more than three times in an article","The keyword placed in the URL only"], c:1 },
+  { s:"Section 2: Keywords and Briefs", q:"Where must the PKW always appear? Select the most complete answer.", o:["H1 and conclusion only","Meta title only","Meta title, meta description, and first 100 words","Every H2 in the article"], c:2 },
+  { s:"Section 2: Keywords and Briefs", q:"Which intent type describes a user who is comparing options before buying?", o:["Navigational","Informational","Transactional","Commercial"], c:3 },
+  { s:"Section 2: Keywords and Briefs", q:"Someone searches 'buy Nike Air Zoom Pegasus.' What is their intent?", o:["Informational","Commercial","Transactional","Navigational"], c:2 },
+  { s:"Section 2: Keywords and Briefs", q:"Someone searches 'best project management tools for remote teams.' What is their intent?", o:["Navigational","Transactional","Informational","Commercial"], c:3 },
+  { s:"Section 2: Keywords and Briefs", q:"What does keyword difficulty tell a writer?", o:["How many times to use the keyword in the article","How hard it is to rank for that keyword given existing competition","Whether the keyword is appropriate for a listicle","How long the article needs to be"], c:1 },
+  { s:"Section 2: Keywords and Briefs", q:"What is a long-tail keyword?", o:["Any keyword longer than five words","A keyword with no search volume","A more specific, lower-volume keyword phrase that signals clearer intent","A keyword used only in the conclusion"], c:2 },
+  { s:"Section 2: Keywords and Briefs", q:"What is the purpose of a content brief?", o:["To count the words in a finished article","To replace the need for research","To define the structure, angle, and requirements before writing begins","To generate the meta description automatically"], c:2 },
+  { s:"Section 2: Keywords and Briefs", q:"What is the heading walk?", o:["Reading only the H2s in sequence to check the argument holds without the body","Counting how many headings an article has","Moving headings from H2 to H3 for SEO","Removing unnecessary subheadings from a draft"], c:0 },
+  { s:"Section 2: Keywords and Briefs", q:"What does a TL;DR section do in an article?", o:["Summarises the article for readers who skim, and serves as an AEO target for AI Overviews","Replaces the introduction","Functions as the article's conclusion","Lists the sources used"], c:0 },
+  { s:"Section 3: Meta Titles and Descriptions", q:"What is the recommended character limit for a meta title?", o:["30-40 characters","50-60 characters","70-80 characters","100-120 characters"], c:1 },
+  { s:"Section 3: Meta Titles and Descriptions", q:"What is the recommended character limit for a meta description?", o:["80-100 characters","120-130 characters","140-160 characters","180-200 characters"], c:2 },
+  { s:"Section 3: Meta Titles and Descriptions", q:"What is the difference between a meta title and an H1?", o:["They are the same thing","The meta title appears in search results; the H1 appears on the page","The H1 appears in search results; the meta title appears on the page","The meta title is longer than the H1"], c:1 },
+  { s:"Section 3: Meta Titles and Descriptions", q:"Which of the following is a non-negotiable rule for every meta title at Magnaitic?", o:["It must include the author's name","It must be written in title case","It must contain the PKW","It must end with a question mark"], c:2 },
+  { s:"Section 4: Structure and H2s", q:"What is the answer-before-bullets rule?", o:["Every bullet point must start with a number","Each H2 section must open with a direct answer sentence before adding bullets or detail","Bullet points are not allowed in any article","The conclusion must summarise all bullets"], c:1 },
+  { s:"Section 4: Structure and H2s", q:"Which of the following is the correct opening for an H2 section titled 'What is AEO?'", o:["'There are many ways to think about AEO.'","'In this section, we will explore AEO.'","'AEO stands for answer engine optimization. It is the practice of structuring content so AI tools can cite it directly as an answer.'","'Let's dive into what AEO really means.'"], c:2 },
+  { s:"Section 4: Structure and H2s", q:"What are the three FAQ types every article should include?", o:["Who, what, where","Short, medium, long","What is / How to / Yes or No","Definition, list, opinion"], c:2 },
+  { s:"Section 4: Structure and H2s", q:"Where must the direct answer appear in a FAQ response?", o:["In the final sentence","In the middle of the response","In the first sentence","After a brief introduction"], c:2 },
+  { s:"Section 5: Sourcing and Verification", q:"Why can AI tools not be used to source facts independently?", o:["They are too slow","They do not have internet access","They generate plausible-sounding information that may be fabricated or outdated","They only work in English"], c:2 },
+  { s:"Section 5: Sourcing and Verification", q:"What is a primary source?", o:["The most popular article on a topic","An original study, report, dataset, or direct statement from the originating organisation","Any article published by a major news outlet","A Wikipedia page with citations"], c:1 },
+  { s:"Section 5: Sourcing and Verification", q:"What should a writer do if they cannot verify a statistic from its original source?", o:["Use it anyway if it appears on multiple sites","Rewrite it slightly and publish","Remove it from the article","Attribute it to various sources"], c:2 },
+  { s:"Section 5: Sourcing and Verification", q:"When should pricing information always be verified?", o:["Only if the product is expensive","Only on the day of publication","At the time of writing, from the live pricing page, with the date noted","Annually"], c:2 },
+  { s:"Section 6: Editorial Standards", q:"Which of the following must be set in Grammarly before running it on any draft?", o:["British English","Australian English","US English","Canadian English"], c:2 },
+  { s:"Section 6: Editorial Standards", q:"What is the maximum recommended paragraph length in a Magnaitic article?", o:["Two lines","Four lines","Six lines","Eight lines"], c:1 },
+  { s:"Section 6: Editorial Standards", q:"Before submitting any draft, what must a writer check for in addition to grammar and structure?", o:["Word count only","Em dashes, client mentions, sentence case on headings, and Grammarly set to US English","Backlinks and internal links only","Image file sizes"], c:1 }
+];
+
+const LETTERS = ['A','B','C','D'];
+let cur = 0, score = 0, answered = false;
+
+const qCountEl = document.getElementById('qCount');
+const sectionMeta = document.getElementById('sectionMeta');
+const sectionChip = document.getElementById('sectionChip');
+const qTextEl = document.getElementById('qText');
+const optsEl = document.getElementById('opts');
+const feedbackEl = document.getElementById('feedback');
+const btnNext = document.getElementById('btnNext');
+const progressFill = document.getElementById('progressFill');
+const quizArea = document.getElementById('quizArea');
+const scoreScreen = document.getElementById('scoreScreen');
+
+function load() {
+  answered = false;
+  const q = QS[cur];
+  qCountEl.textContent = `Question ${cur + 1} of ${QS.length}`;
+  sectionMeta.textContent = q.s;
+  sectionChip.textContent = q.s;
+  progressFill.style.width = `${(cur / QS.length) * 100}%`;
+  qTextEl.textContent = q.q;
+  optsEl.innerHTML = '';
+  feedbackEl.hidden = true;
+  feedbackEl.className = 'feedback';
+  feedbackEl.textContent = '';
+  btnNext.hidden = true;
+  btnNext.textContent = cur === QS.length - 1 ? 'See my results' : 'Next question';
+
+  q.o.forEach((txt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.innerHTML = `<span class="opt-letter">${LETTERS[i]}</span><span>${txt}</span>`;
+    btn.addEventListener('click', () => pick(i));
+    optsEl.appendChild(btn);
+  });
+}
+
+function pick(idx) {
+  if (answered) return;
+  answered = true;
+  const q = QS[cur];
+  const btns = optsEl.querySelectorAll('.opt');
+  btns.forEach(b => b.disabled = true);
+
+  if (idx === q.c) {
+    btns[idx].classList.add('is-correct');
+    score++;
+    feedbackEl.textContent = 'Correct.';
+    feedbackEl.className = 'feedback ok';
+  } else {
+    btns[idx].classList.add('is-wrong');
+    btns[q.c].classList.add('is-correct');
+    feedbackEl.textContent = `Not quite. The correct answer is ${LETTERS[q.c]}.`;
+    feedbackEl.className = 'feedback err';
+  }
+  feedbackEl.hidden = false;
+  btnNext.hidden = false;
+}
+
+btnNext.addEventListener('click', () => {
+  cur++;
+  if (cur >= QS.length) showScore();
+  else load();
+});
+
+function showScore() {
+  quizArea.hidden = true;
+  scoreScreen.hidden = false;
+  const total = QS.length;
+  const pct = Math.round((score / total) * 100);
+  document.getElementById('scoreNum').textContent = `${score}/${total}`;
+  document.getElementById('bdOk').textContent = score;
+  document.getElementById('bdErr').textContent = total - score;
+  document.getElementById('bdPct').textContent = `${pct}%`;
+
+  let grade, msg;
+  if (pct >= 90) {
+    grade = 'Distinction';
+    msg = 'You have a strong grasp of every section. This is the standard Magnaitic expects from a lead writer.';
+  } else if (pct >= 75) {
+    grade = 'Pass';
+    msg = 'Solid performance. Review the questions you missed and you will have all the core standards covered.';
+  } else if (pct >= 50) {
+    grade = 'Needs Review';
+    msg = 'You have the basics down but some standards need reinforcement. Revisit the relevant modules and try again.';
+  } else {
+    grade = 'Try Again';
+    msg = 'Go back through the course materials, then return to this quiz. Everything you need is in the modules.';
+  }
+  document.getElementById('scoreGrade').textContent = grade;
+  document.getElementById('scoreMsg').textContent = msg;
+
+  const circ = 2 * Math.PI * 54;
+  const arc = document.getElementById('scoreArc');
+  arc.setAttribute('stroke-dasharray', circ);
+  arc.setAttribute('stroke-dashoffset', circ);
+  setTimeout(() => {
+    arc.style.transition = 'stroke-dashoffset 1.1s cubic-bezier(0.4,0,0.2,1)';
+    arc.style.strokeDashoffset = circ - (pct / 100) * circ;
+  }, 80);
+}
+
+document.getElementById('btnRestart').addEventListener('click', () => {
+  cur = 0; score = 0;
+  scoreScreen.hidden = true;
+  quizArea.hidden = false;
+  const arc = document.getElementById('scoreArc');
+  arc.style.transition = 'none';
+  const circ = 2 * Math.PI * 54;
+  arc.style.strokeDashoffset = circ;
+  load();
+});
+
+load();
+</script>
